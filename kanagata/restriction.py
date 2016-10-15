@@ -18,8 +18,10 @@ class DictRestriction:
 
     def validate_dict(self, data, skip_member_validation=False):
         if not skip_member_validation:
+            if not hasattr(data, "keys"):
+                raise ValueError("{}: required dict but {!r}. (members={})".format(self.name, data, list(self.fields.keys())))
             for k in data.keys():
-                self.validate_member(k, data)
+                data[k] = self.validate_member(k, data)
 
         # todo: performance
         keys_from_fields = set(v.name for v in self.fields.values() if v.required)
@@ -37,7 +39,7 @@ class DictRestriction:
         field = self.fields.get(k)
         if field is None:
             if not self.options["additional_properties"]:
-                raise ValueError("{}: unsupported field {!r}, field members={}".format(self.name, k, list(self.fields.keys())))
+                raise ValueError("{}: unsupported field {!r}, members={}".format(self.name, k, list(self.fields.keys())))
             else:
                 return value
 
@@ -47,6 +49,8 @@ class DictRestriction:
             return field.type(value)
 
     def __call__(self, value):
+        if hasattr(value, "restriction") and value.restriction is self:
+            return value
         dict_class = self.repository[self.name]
         return dict_class(value)
 
@@ -60,6 +64,8 @@ class ListRestriction:
         self.repository = repository
 
     def __call__(self, value):
+        if hasattr(value, "restriction") and value.restriction is self:
+            return value
         list_class = self.repository[self.restriction.name]
         return list_class(value)
 

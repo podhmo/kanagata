@@ -8,8 +8,7 @@ class RestrictedDict(UserDict):
 
     def __init__(self, *args, **kwargs):
         data = args[0] if args else kwargs
-        self.restriction.validate_dict(data)
-        super().__init__(data)
+        super().__init__(self.restriction.validate_dict(data))
 
     def __getitem__(self, k):
         return self.restriction.access(k, self.data)
