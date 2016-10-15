@@ -33,7 +33,11 @@ models.py
   skill = b.define_dict("Skill")
   skill.add_member("name", required=True)
 
-  b.build().expose(globals())  # Group, User, Skill are exported
+  school = b.define_dict("School")
+  school.add_member("name")
+  school.add_list("groups", "Group", required=True)
+
+  b.build().expose(globals())  # Group, User, Skill, School are exported
 
 .. code-block:: python
 
