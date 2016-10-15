@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import sys
 from collections import OrderedDict
 from .restriction import Field, Any
 from .restriction import ListRestriction
@@ -84,3 +85,17 @@ class RestrictionBuilder:
 
     def build(self):
         return self.module
+
+    def __enter__(self):
+        return self
+
+    _depth = 1
+
+    @property
+    def is_root_builder(self):
+        return self.name is None and self.factory_name is None
+
+    def __exit__(self, type, value, traceback):
+        if self.is_root_builder:
+            frame = sys._getframe(self._depth)
+            self.build().expose(frame.f_globals)

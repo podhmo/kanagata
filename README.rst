@@ -18,26 +18,23 @@ models.py
   # group: name, users
   # user: name, age, Option[skills], Option[school]
   # skill: name
-  b = RestrictionBuilder()
+  with RestrictionBuilder() as b:
+      with b.define_dict("Group") as group:
+          group.add_member("name", required=True)
+          group.add_list("users", "User", required=True)
 
-  group = b.define_dict("Group")
-  group.add_member("name", required=True)
-  group.add_list("users", "User", required=True)
+      with b.define_dict("User") as user:
+          user.add_member("name", required=True)
+          user.add_member("age", required=True)
+          user.add_dict("school", "School", required=False)
+          user.add_list("skills", "Skill", required=False)
 
-  user = b.define_dict("User")
-  user.add_member("name", required=True)
-  user.add_member("age", required=True)
-  user.add_dict("school", "School", required=False)
-  user.add_list("skills", "Skill", required=False)
+      with b.define_dict("Skill") as skill:
+          skill.add_member("name", required=True)
 
-  skill = b.define_dict("Skill")
-  skill.add_member("name", required=True)
-
-  school = b.define_dict("School")
-  school.add_member("name")
-  school.add_list("groups", "Group", required=True)
-
-  b.build().expose(globals())  # Group, User, Skill, School are exported
+      with b.define_dict("School") as school:
+          school.add_member("name")
+          school.add_list("groups", "Group", required=True)
 
 .. code-block:: python
 
