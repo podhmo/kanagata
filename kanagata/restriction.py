@@ -45,6 +45,8 @@ class DictRestriction:
 
         if skip_type_validation or field.type is Any:
             return value
+        elif field.type is getattr(value, "restriction", None):
+            return value
         else:
             return field.type(value)
 

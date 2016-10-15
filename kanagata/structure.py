@@ -14,10 +14,7 @@ class RestrictedDict(UserDict):
         return self.restriction.access(k, self.data)
 
     def __setitem__(self, k, v):
-        if hasattr(v, "restriction") and v.restriction is self.restriction.fields[k]:
-            super().__setitem__(k, v)
-        else:
-            super().__setitem__(k, self.restriction.validate_member_value(k, v, skip_type_validation=False))
+        super().__setitem__(k, self.restriction.validate_member_value(k, v, skip_type_validation=False))
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
