@@ -39,3 +39,19 @@ class RestrictedList(UserList):
 
     def extend(self, xs):
         return super().extend(self.restriction.validate_item(x) for x in xs)
+
+
+class TypedList(UserList):
+    type = None
+
+    def __init__(self, *args):
+        if not args:
+            super().__init__()
+        else:
+            super().__init__((self.type(x) for x in args[0]))
+
+    def append(self, x):
+        return super().append(self.type(x))
+
+    def extend(self, xs):
+        return super().extend((self.type(x) for x in xs))

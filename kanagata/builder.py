@@ -6,6 +6,7 @@ from .restriction import ListRestriction
 from .restriction import DictRestriction
 from .repository import RestrictedDictRepository
 from .repository import RestrictedListRepository
+from .structure import TypedList
 
 
 class Module:
@@ -75,7 +76,14 @@ class RestrictionBuilder:
         self.fields[name] = Field(name=name, required=required, type=sub.restriction, default=default)
         return sub
 
-    def add_list(self, name, factory_name, required=True, restriction=None, options=None, default=NOTSET):
+    def add_list(self, name, factory_name=None, required=True, restriction=None, options=None, default=NOTSET):
+        if factory_name is None:
+            if restriction is None:
+                list_class = list
+            else:
+                list_class = type("{}List".format(restriction.__name__.title()), (TypedList, ), {})
+                list_class.type = restriction
+            return self.add_member(name, required=required, type=list_class, default=list_class)
         options = options or self.options
         dict_restriction, created = self.get_or_create_restriction(factory_name, options)
         if created:
