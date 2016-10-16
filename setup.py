@@ -27,7 +27,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='kanagata',
-      version='0.0',
+      version='0.0.1',
       description='restricted dict',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
