@@ -3,7 +3,8 @@ from collections import namedtuple
 
 
 Any = None
-Field = namedtuple("Field", "name required type")
+NOTSET = object()
+Field = namedtuple("Field", "name required type default")
 
 
 class DictRestriction:
@@ -27,6 +28,14 @@ class DictRestriction:
         keys_from_fields = set(v.name for v in self.fields.values() if v.required)
         keys_from_data = set(data.keys())
         diff = keys_from_fields.difference(keys_from_data)
+        for k in tuple(diff):
+            default = self.fields[k].default
+            if default is not NOTSET:
+                if callable(default):
+                    data[k] = default()
+                else:
+                    data[k] = default
+                diff.discard(k)
         if diff:
             raise ValueError("{}: required fields {} are not found".format(self.name, diff))
         return data

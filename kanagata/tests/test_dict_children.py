@@ -25,7 +25,7 @@ class DictNestedTests(unittest.TestCase):
 
         school = b.define_dict("School")
         school.add_member("name")
-        school.add_list("groups", "Group", required=True)
+        school.add_list("groups", "Group", required=True, default=list)
         return b.build()
 
     def test_dict__missing_arguments(self):
@@ -88,7 +88,7 @@ class DictNestedTests(unittest.TestCase):
 
     def test_child_dict(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})  # default: groups=[]
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         self.assertEqual(user["school"]["name"], "ABC")
         self.assertEqual(list(sorted(user["school"].keys())), ["groups", "name"])
 
@@ -99,48 +99,48 @@ class DictNestedTests(unittest.TestCase):
 
     def test_child_dict__setitem(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         user["school"] = {"name": "XYZ", "groups": []}
         self.assertEqual(user["school"]["name"], "XYZ")
 
     def test_child_dict__setitem__typed_item(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         user["school"] = m.School({"name": "XYZ", "groups": []})
         self.assertEqual(user["school"]["name"], "XYZ")
 
     def test_child_dict__setitem__with__missing_arguments(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         with self.assertRaises(ValueError):
-            user["school"] = {"name": "XYZ"}
+            user["school"] = {"groups": [{"name": "g", "users": []}]}
 
     def test_child_dict__setitem__with__extra_arguments(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         with self.assertRaises(ValueError):
             user["school"]["xxxx"] = "zzzz"
 
     def test_child_dict__update(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         user["school"].update({"name": "XYZ", "groups": []})
         self.assertEqual(user["school"]["name"], "XYZ")
 
     def test_child_dict__update__typed_item(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         user["school"].update(m.School({"name": "XYZ", "groups": []}))
         self.assertEqual(user["school"]["name"], "XYZ")
 
     def test_child_dict__update__with__missing_arguments(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         user["school"].update({"name": "XYZ"})
         self.assertEqual(user["school"]["name"], "XYZ")
 
     def test_child_dict__update__with__extra_arguments(self):
         m = self._makeModule()
-        user = m.User(name="foo", age=10, school={"name": "ABC", "groups": []})
+        user = m.User(name="foo", age=10, school={"name": "ABC"})  # default: groups=[]
         with self.assertRaises(ValueError):
             user["school"].update({"name": "XYZ", "xxx": "zzz"})

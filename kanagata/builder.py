@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import sys
 from collections import OrderedDict
-from .restriction import Field, Any
+from .restriction import Field, Any, NOTSET
 from .restriction import ListRestriction
 from .restriction import DictRestriction
 from .repository import RestrictedDictRepository
@@ -50,10 +50,10 @@ class RestrictionBuilder:
         restriction = DictRestriction(factory_name, OrderedDict(), options, repository=repository)
         return restriction, True
 
-    def add_member(self, name, required=True, type=Any, force=False):
+    def add_member(self, name, required=True, type=Any, force=False, default=NOTSET):
         if not force and name in self.fields:
             raise ValueError("conflicted. {} is already existed.".format(self.fields[name]))
-        field = Field(name=name, required=required, type=type)
+        field = Field(name=name, required=required, type=type, default=default)
         self.fields[name] = field
 
     def define_dict(self, factory_name, required=True, restriction=None, options=None):
@@ -63,15 +63,15 @@ class RestrictionBuilder:
         repository.register(factory_name, sub.restriction)
         return sub
 
-    def add_dict(self, name, factory_name, required=True, restriction=None, options=None):
+    def add_dict(self, name, factory_name, required=True, restriction=None, options=None, default=NOTSET):
         options = options or self.options
         sub = self.__class__(name, factory_name, restriction=restriction, options=options, parent=self, module=self.module)
         repository = self.module.dict_repository
         repository.register(factory_name, sub.restriction)
-        self.fields[name] = Field(name=name, required=required, type=sub.restriction)
+        self.fields[name] = Field(name=name, required=required, type=sub.restriction, default=default)
         return sub
 
-    def add_list(self, name, factory_name, required=True, restriction=None, options=None):
+    def add_list(self, name, factory_name, required=True, restriction=None, options=None, default=NOTSET):
         options = options or self.options
         dict_restriction, created = self.get_or_create_restriction(factory_name, options)
         if created:
@@ -80,7 +80,7 @@ class RestrictionBuilder:
         sub = self.__class__(name, factory_name, restriction=restriction, options=options, parent=self, module=self.module)
         repository = self.module.list_repository
         repository.register(factory_name, sub.restriction)
-        self.fields[name] = Field(name=name, required=required, type=sub.restriction)
+        self.fields[name] = Field(name=name, required=required, type=sub.restriction, default=default)
         return sub
 
     def build(self):
