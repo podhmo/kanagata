@@ -22,6 +22,10 @@ class Module:
     def expose(self, d):
         for name, dict_class in self.dict_repository:
             d[name] = dict_class
+        for name, list_class in self.list_repository:
+            name = "{}List".format(name)
+            if name not in self.dict_repository:
+                d[name] = list_class
 
 
 class RestrictionBuilder:

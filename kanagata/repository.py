@@ -7,6 +7,9 @@ class Repository:
     def __init__(self):
         self.pool = {}
 
+    def __contains__(self, k):
+        return k in self.pool
+
     def __getitem__(self, k):
         return self.pool[k]
 
